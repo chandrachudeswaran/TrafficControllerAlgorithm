@@ -32,8 +32,9 @@ public class TrafficController {
 		counter_c = 0;
 		counter_d = 0;
 		traffic_served_list = new LinkedHashSet<String>();
-		// filename= "//home//pi//project_workspace//socketserver//";
-		filename = "C:\\Users\\chandra\\Desktop\\Sujay\\";
+		//filename= "//home//pi//project_workspace//socketserver//";
+		//filename = "C:\\Users\\chandra\\Desktop\\Sujay\\";
+		filename = "C:\\Users\\Raghuveer\\Desktop\\Sujay\\";	
 	}
 
 	public void write(String content, String filename) {
@@ -63,32 +64,6 @@ public class TrafficController {
 		}
 	}
 	
-	public void writeRedValuesToAllFiles(String key) {
-		for (int i = 1; i < 5; i++) {
-			write("0", filename + "myresult" + i + ".txt");
-		}
-		writeSignalResult(key);
-	}
-
-	public void writeSignalResult(String key) {
-		String name = "";
-		switch (key) {
-		case "A":
-			name = filename + "myresult1.txt";
-			break;
-		case "B":
-			name = filename + "myresult2.txt";
-			break;
-		case "C":
-			name = filename + "myresult3.txt";
-			break;
-		case "D":
-			name = filename + "myresult4.txt";
-			break;
-		}
-		write("1", name);
-		storeHistoryValues();
-	}
 	public void storeHistoryValues() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(counter_a);
@@ -124,17 +99,15 @@ public class TrafficController {
 		return content;
 	}
 
-	public void readInput() {
-		int[] array = new int[4];
-			for (int i = 1; i < 5; i++) {
-				array[i-1]=Integer.valueOf(read(filename + "mytext" + i+ ".txt"));
-			}
-			File f = new File(filename + "history.txt");
-			if (f.exists() && !f.isDirectory()) {
-				readHistoryValues();
-			}
-			doAnalysis(array[0], array[1], array[2], array[3]);
+	public boolean checkHistoryExists(String filename){
+		File f = new File(filename + "history.txt");
+		if (f.exists() && !f.isDirectory()) {
+			return true;
+		}else{
+			return false;
+		}
 	}
+	
 
 	public void readHistoryValues() {
 		String[] array =read(filename + "history.txt").split(";");
@@ -179,6 +152,9 @@ public class TrafficController {
 	}
 
 	public String doAnalysis(int a, int b, int c, int d) {
+		if(checkHistoryExists(filename + "history.txt")){
+			readHistoryValues();
+		}
 		zeroList = new ArrayList<String>();
 		HashMap<String, Integer> input_map = new HashMap<String, Integer>();
 		populateInputs(input_map, zeroList, a, 1);
@@ -193,17 +169,14 @@ public class TrafficController {
 			incrementCounterForKey(key);
 			storeHistoryValues();
 			return key;
-			//writeRedValuesToAllFiles(key);
 		} else if (traffic_served_list.contains(key)) {
 			String op = doAction(traffic_served_list, key);
 			storeHistoryValues();
 			return op;
-			//writeRedValuesToAllFiles(doAction(traffic_served_list, key));
 		} else {
 			String op = doAction(traffic_served_list, key);
 			storeHistoryValues();
 			return op;
-			//writeRedValuesToAllFiles(doAction(traffic_served_list, key));
 		}
 
 	}
@@ -327,9 +300,6 @@ public class TrafficController {
 		return sortedMap;
 	}
 
-	public static void main(String[] args) {
-		TrafficController traffic = new TrafficController();
-		traffic.readInput();
-	}
+
 
 }
